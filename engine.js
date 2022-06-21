@@ -186,6 +186,23 @@ module.exports = function(options) {
             return answers.isIssueAffected;
           },
           default: options.defaultIssues ? options.defaultIssues : undefined
+        },
+
+        // adding way to add clickup task reference
+        {
+          type: 'confirm',
+          name: 'isClickUPTaskLinked',
+          message: 'Does this change linked with any ClickUp Task?',
+          default: options.defaultClickUpTask ? true : false
+        },
+        {
+          type: 'input',
+          name: 'clickUpTaskId',
+          message: 'Add issue references (e.g. "completed #ax3esf", "refactored #ax3esf".):\n',
+          when: function(answers) {
+            return answers.isClickUPTaskLinked;
+          },
+          default: options.defaultClickUpTask ? options.defaultClickUpTask : undefined
         }
       ]).then(function(answers) {
         var wrapOptions = {
@@ -214,7 +231,9 @@ module.exports = function(options) {
 
         var issues = answers.issues ? wrap(answers.issues, wrapOptions) : false;
 
-        commit(filter([head, body, breaking, issues]).join('\n\n'));
+        var clickUpTask = answers.clickUpTaskId ? wrap(answers.clickUpTaskId, wrapOptions) : false;
+
+        commit(filter([head, body, breaking, issues, clickUpTask]).join('\n\n'));
       });
     }
   };
